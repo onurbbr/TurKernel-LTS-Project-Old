@@ -1360,6 +1360,13 @@ static int msm_dig_cdc_soc_probe(struct snd_soc_codec *codec)
 	struct snd_soc_dapm_context *dapm = snd_soc_codec_get_dapm(codec);
 	int i, ret;
 
+/*zhiguang.su@MultiMedia.AudioDrv, 2017-03-27, add for debug*/
+pr_err("%s enter\n", __func__);
+
+#ifdef CONFIG_SOUND_CONTROL
+	sound_control_codec_ptr = codec;
+#endif
+
 	msm_dig_cdc->codec = codec;
 
 	snd_soc_add_codec_controls(codec, compander_kcontrols,
@@ -2208,6 +2215,18 @@ static int msm_dig_cdc_probe(struct platform_device *pdev)
 			__func__, "reg");
 		return ret;
 	}
+
+#ifdef CONFIG_SOUND_CONTROL
+	sound_control_kobj = kobject_create_and_add("sound_control", kernel_kobj);
+	if (sound_control_kobj == NULL) {
+		pr_warn("%s kobject create failed!\n", __func__);
+        }
+
+	ret = sysfs_create_group(sound_control_kobj, &sound_control_attr_group);
+        if (ret) {
+		pr_warn("%s sysfs file create failed!\n", __func__);
+	}
+#endif
 
 	msm_dig_cdc->dig_base = ioremap(dig_cdc_addr,
 					MSM89XX_CDC_CORE_MAX_REGISTER);
