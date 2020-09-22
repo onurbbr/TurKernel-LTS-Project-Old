@@ -217,8 +217,7 @@ ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 dtbo-$(CONFIG_MACH_XIAOMI_LAVENDER) += sdm660-mtp-lavender-overlay.dtbo
 sdm660-mtp-lavender-overlay.dtbo-base := sdm660-mtp-lavender.dtb
 else
-dtb-$(CONFIG_MACH_XIAOMI_JASON) := sdm660-mtp-jason.dtb
-dtb-$(CONFIG_MACH_XIAOMI_JASON) := sdm660-mtp-jason-nontreble.dtb
+dtb-$(CONFIG_MACH_XIAOMI_JASON) := sdm660-mtp-jason.dtb sdm660-mtp-jason-nontreble.dtb
 endif
 else
 dtb-$(CONFIG_ARCH_SDM660) += sdm660-sim.dtb \
