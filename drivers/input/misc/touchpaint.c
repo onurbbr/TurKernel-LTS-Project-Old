@@ -22,7 +22,7 @@ static phys_addr_t fb_phys_addr = 0x9c000000;
 static size_t fb_max_size = 0x02400000;
 /* Pixel format is assumed to be ARGB_8888 */
 static int fb_width = 1080;
-static int fb_height = 2340;
+static int fb_height = 1920;
 /* true = fill screen, false = paint */
 static bool fill_on_touch = false;
 static int paint_radius = 3; /* pixels, must be odd */
