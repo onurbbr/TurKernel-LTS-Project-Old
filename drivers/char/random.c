@@ -382,7 +382,7 @@ static int random_read_wakeup_bits = 64;
  * should wake up processes which are selecting or polling on write
  * access to /dev/random.
  */
-static int random_write_wakeup_bits = 28 * OUTPUT_POOL_WORDS;
+static int random_write_wakeup_bits = 2 * OUTPUT_POOL_WORDS;
 
 /*
  * Originally, we used a primitive polynomial of degree .poolwords
@@ -802,8 +802,7 @@ retry:
 		}
 
 		/* should we wake readers? */
-		if (entropy_bits >= random_read_wakeup_bits &&
-		    wq_has_sleeper(&random_read_wait)) {
+		if (entropy_bits >= random_read_wakeup_bits) {
 			wake_up_interruptible(&random_read_wait);
 			kill_fasync(&fasync, SIGIO, POLL_IN);
 		}
@@ -1048,6 +1047,11 @@ static void crng_reseed(struct crng_state *crng, struct entropy_store *r)
 			urandom_warning.missed = 0;
 		}
 	}
+}
+
+static inline void crng_wait_ready(void)
+{
+	wait_event_interruptible(crng_init_wait, crng_ready());
 }
 
 static void _extract_crng(struct crng_state *crng,
@@ -1699,11 +1703,8 @@ static void _warn_unseeded_randomness(const char *func_name, void *caller,
  * number of good random numbers, suitable for key generation, seeding
  * TCP sequence numbers, etc.  It does not rely on the hardware random
  * number generator.  For random bytes direct from the hardware RNG
- * (when available), use get_random_bytes_arch(). In order to ensure
- * that the randomness provided by this function is okay, the function
- * wait_for_random_bytes() should be called and return 0 at least once
- * at any point prior.
- */
+ * (when available), use get_random_bytes_arch().
+*/
 static void _get_random_bytes(void *buf, int nbytes)
 {
 	__u8 tmp[CHACHA20_BLOCK_SIZE] __aligned(4);
@@ -1733,39 +1734,6 @@ void get_random_bytes(void *buf, int nbytes)
 	_get_random_bytes(buf, nbytes);
 }
 EXPORT_SYMBOL(get_random_bytes);
-
-/*
- * Wait for the urandom pool to be seeded and thus guaranteed to supply
- * cryptographically secure random numbers. This applies to: the /dev/urandom
- * device, the get_random_bytes function, and the get_random_{u32,u64,int,long}
- * family of functions. Using any of these functions without first calling
- * this function forfeits the guarantee of security.
- *
- * Returns: 0 if the urandom pool has been seeded.
- *          -ERESTARTSYS if the function was interrupted by a signal.
- */
-int wait_for_random_bytes(void)
-{
-	if (likely(crng_ready()))
-		return 0;
-	return wait_event_interruptible(crng_init_wait, crng_ready());
-}
-EXPORT_SYMBOL(wait_for_random_bytes);
-
-/*
- * Returns whether or not the urandom pool has been seeded and thus guaranteed
- * to supply cryptographically secure random numbers. This applies to: the
- * /dev/urandom device, the get_random_bytes function, and the get_random_{u32,
- * ,u64,int,long} family of functions.
- *
- * Returns: true if the urandom pool has been seeded.
- *          false if the urandom pool has not been seeded.
- */
-bool rng_is_initialized(void)
-{
-	return crng_ready();
-}
-EXPORT_SYMBOL(rng_is_initialized);
 
 /*
  * Add a callback function that will be invoked when the nonblocking
@@ -2125,8 +2093,6 @@ const struct file_operations urandom_fops = {
 SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
 		unsigned int, flags)
 {
-	int ret;
-
 	if (flags & ~(GRND_NONBLOCK|GRND_RANDOM))
 		return -EINVAL;
 
@@ -2139,9 +2105,9 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
 	if (!crng_ready()) {
 		if (flags & GRND_NONBLOCK)
 			return -EAGAIN;
-		ret = wait_for_random_bytes();
-		if (unlikely(ret))
-			return ret;
+		crng_wait_ready();
+		if (signal_pending(current))
+			return -ERESTARTSYS;
 	}
 	return urandom_read(NULL, buf, count, NULL);
 }
@@ -2436,18 +2402,12 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
 		return;
 	}
 
-	if (unlikely(nonblocking_pool.initialized == 0))
-		poolp = &nonblocking_pool;
-	else {
-		/* Suspend writing if we're above the trickle
-		 * threshold.  We'll be woken up again once below
-		 * random_write_wakeup_thresh, or when the calling
-		 * thread is about to terminate.
-		 */
-		wait_event_interruptible(random_write_wait,
-					 kthread_should_stop() ||
+	/* Suspend writing if we're above the trickle threshold.
+	 * We'll be woken up again once below random_write_wakeup_thresh,
+	 * or when the calling thread is about to terminate.
+	 */
+	wait_event_interruptible(random_write_wait, kthread_should_stop() ||
 			ENTROPY_BITS(&input_pool) <= random_write_wakeup_bits);
-	}
 	mix_pool_bytes(poolp, buffer, count);
 	credit_entropy_bits(poolp, entropy);
 }
