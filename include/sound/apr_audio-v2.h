@@ -660,7 +660,7 @@ struct adm_cmd_set_pp_params {
 #define ADM_CMD_GET_MTMX_STRTR_DEV_PARAMS_V1	0x00010368
 #define ADM_CMDRSP_GET_MTMX_STRTR_DEV_PARAMS_V1	0x00010369
 
-/* Payload of the #define ADM_CMD_SET_MTMX_STRTR_DEV_PARAMS_V1 command.
+/* Payload of the #defineï¿½ADM_CMD_SET_MTMX_STRTR_DEV_PARAMS_V1 command.
  * If the data_payload_addr_lsw and data_payload_addr_msw element
  * are NULL, a series of struct param_hdr_v3 structures immediately
  * follows, whose total size is payload_size bytes.
@@ -10227,24 +10227,6 @@ struct srs_trumedia_params {
 #define APTX_DECODER_BT_ADDRESS 0x00013201
 #define APTX_CLASSIC_DEC_LICENSE_ID 0x00013202
 
-#ifdef CONFIG_AINUR_DTS_HW
-#define AUDPROC_MODULE_ID_DTS_HPX_PREMIX 0x0001077C
-#define AUDPROC_MODULE_ID_DTS_HPX_POSTMIX 0x0001077B
-#define ASM_STREAM_POSTPROC_TOPO_ID_DTS_HPX 0x00010DED
-#define ASM_STREAM_POSTPROC_TOPO_ID_HPX_PLUS  0x10015000
-#define ASM_STREAM_POSTPROC_TOPO_ID_HPX_MASTER  0x10015001
-struct asm_dts_eagle_param {
-	struct apr_hdr	hdr;
-	struct asm_stream_cmd_set_pp_params param;
-	struct param_hdr_v3 data;
-} __packed;
-
-struct asm_dts_eagle_param_get {
-	struct apr_hdr	hdr;
-	struct asm_stream_cmd_get_pp_params_v2 param;
-} __packed;
-#endif
-
 struct aptx_dec_bt_addr_cfg {
 	uint32_t lap;
 	uint32_t uap;
@@ -10733,7 +10715,7 @@ struct afe_clk_set {
 	 * for enable and disable clock.
 	 *	"clk_freq_in_hz", "clk_attri", and "clk_root"
 	 *	are ignored in disable clock case.
-	 *	@values 
+	 *	@valuesï¿½
 	 *	- 0 -- Disabled
 	 *	- 1 -- Enabled  @tablebulletend
 	 */
