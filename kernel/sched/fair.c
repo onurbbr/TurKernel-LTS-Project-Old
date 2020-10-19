@@ -77,8 +77,8 @@ enum sched_tunable_scaling sysctl_sched_tunable_scaling
  * Minimal preemption granularity for CPU-bound tasks:
  * (default: 0.75 msec * (1 + ilog(ncpus)), units: nanoseconds)
  */
-unsigned int sysctl_sched_min_granularity = 1250000ULL;
-unsigned int normalized_sysctl_sched_min_granularity = 1250000ULL;
+unsigned int sysctl_sched_min_granularity		= 1250000ULL;
+unsigned int normalized_sysctl_sched_min_granularity	= 1250000ULL;
 
 /*
  * is kept at sysctl_sched_latency / sysctl_sched_min_granularity
@@ -99,7 +99,7 @@ unsigned int sysctl_sched_child_runs_first __read_mostly;
  * and reduces their over-scheduling. Synchronous workloads will still
  * have immediate wakeup/sleep latencies.
  */
-unsigned int sysctl_sched_wakeup_granularity = 5000000UL;
+unsigned int sysctl_sched_wakeup_granularity		= 5000000UL;
 unsigned int normalized_sysctl_sched_wakeup_granularity	= 5000000UL;
 
 const_debug unsigned int sysctl_sched_migration_cost = 500000UL;
@@ -7841,7 +7841,7 @@ static struct task_struct *detach_one_task(struct lb_env *env)
 	return NULL;
 }
 
-static const unsigned int sched_nr_migrate_break = 32;
+static const unsigned int sched_nr_migrate_break = 8;
 
 /*
  * detach_tasks() -- tries to detach up to imbalance weighted load from
