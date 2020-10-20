@@ -375,14 +375,14 @@
  * The minimum number of bits of entropy before we wake up a read on
  * /dev/random.  Should be enough to do a significant reseed.
  */
-static int random_read_wakeup_bits = 64;
+static int random_read_wakeup_bits = 128;
 
 /*
  * If the entropy count falls under this number of bits, then we
  * should wake up processes which are selecting or polling on write
  * access to /dev/random.
  */
-static int random_write_wakeup_bits = 2 * OUTPUT_POOL_WORDS;
+static int random_write_wakeup_bits = 8 * OUTPUT_POOL_WORDS;
 
 /*
  * Originally, we used a primitive polynomial of degree .poolwords
