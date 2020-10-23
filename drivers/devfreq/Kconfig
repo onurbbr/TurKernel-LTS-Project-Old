@@ -125,6 +125,12 @@ config ADRENO_IDLER
 	  wasted power coming from stock Adreno TZ while
 	  maintaining high-performance.
 
+config SIMPLE_GPU_ALGORITHM
+	bool "Simple GPU algorithm"
+	depends on DEVFREQ_GOV_MSM_ADRENO_TZ
+	help
+	  Simple user configurable GPU controlling algorithm
+
 config QCOMCCI_HWMON
 	tristate "QCOM CCI Cache monitor hardware"
 	depends on ARCH_QCOM
