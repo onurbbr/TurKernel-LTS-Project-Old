@@ -126,10 +126,10 @@ config ADRENO_IDLER
 	  maintaining high-performance.
 
 config SIMPLE_GPU_ALGORITHM
-	bool "Simple GPU algorithm"
+	tristate "Simple GPU algorithm"
 	depends on DEVFREQ_GOV_MSM_ADRENO_TZ
 	help
-	  Simple user configurable GPU controlling algorithm
+	  Simple user configurable GPU controlling algorithm.
 
 config QCOMCCI_HWMON
 	tristate "QCOM CCI Cache monitor hardware"
