@@ -1686,3 +1686,13 @@ FORCE:
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
+ # Custom Warnings Disabler
+KBUILD_CFLAGS += $(call cc-disable-warning, self-assign)
+KBUILD_CFLAGS += $(call cc-disable-warning, parentheses-equality)
+KBUILD_CFLAGS += $(call cc-disable-warning, constant-conversion)
+KBUILD_CFLAGS += $(call cc-disable-warning, pragma-pack)
+KBUILD_CFLAGS += $(call cc-disable-warning, enum-conversion)
+KBUILD_CFLAGS += $(call cc-disable-warning, pointer-bool-conversion)
+KBUILD_CFLAGS += $(call cc-disable-warning, self-assign)
+KBUILD_CFLAGS += $(call cc-disable-warning, self-assign)
+
