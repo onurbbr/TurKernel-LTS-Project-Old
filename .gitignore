@@ -126,5 +126,6 @@ android/configs/android-*.cfg
 #
 Android.bp
 
-# Build File
+# Files/Folders that TurKernel will ignore
 build.sh
+out/
